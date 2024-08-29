@@ -51,6 +51,8 @@ class linkedlist
     Node * mergeFirstAndLast(Node *root);
     Node* mergeKnodeAtAtime(Node *root, int k);
     Node * mergek(Node *root, int k);
+    Node * detectloop(Node *root);
+    void removeloop(Node *root);
 
 }; 
 Node * linkedlist :: mergeFirstAndLast(Node * root)
@@ -247,6 +249,28 @@ Node * linkedlist::mergek(Node *root, int k)
 
     return prev;
 }
+Node * linkedlist:: detectloop(Node *root)
+{
+    Node *first = root;
+    Node * second = root;
+
+    while(first && second)
+    {
+        first = first -> next;
+        if(second -> next)
+            second = second -> next -> next;
+
+        if(first == second)
+            return first;
+    }
+
+    return nullptr;
+}
+
+void linkedlist:: removeloop(Node *root)
+{
+
+}
 int main()
 {
     linkedlist ll;
@@ -261,13 +285,45 @@ int main()
     //ll.mergeFirstAndLast(newroot);
     //Node *mergedroot = ll.mergeKnodeAtAtime(newroot, 3);
     //ll.printList(mergedroot);
-    ll.printList(root_copy);
-    cout<<"merged k new list"<<endl;
+    //ll.printList(root_copy);
+    //cout<<"merged k new list"<<endl;
 
     //Node *mergeknew = ll.mergek(root_copy, 3);
     //ll.printList(mergeknew);
-    Node *mergedroot = ll.mergeKnodeAtAtime(newroot, 3);
-    ll.printList(mergedroot);
+    //Node *mergedroot = ll.mergeKnodeAtAtime(newroot, 3);
+    //ll.printList(mergedroot);
+
+    //create a loop in the linkedlist
+
+    Node *it = root_copy;
+    while(it->next)
+    {
+        it = it -> next;
+    }
+
+    it -> next = root_copy;
+
+    Node *looppoint = ll.detectloop(root_copy);
+    if(looppoint)
+    {
+        cout<<"loop exists"<<endl;
+        //remove the loop and print the list
+        Node *first = looppoint;
+        while(looppoint->next != first)
+        {
+            looppoint = looppoint -> next;
+        }
+        looppoint->next = nullptr;
+
+        //after removing the loop
+        ll.printList(root_copy);
+
+    }
+    else
+        cout<< "loop doesn't exist"<<endl;
+
+    
+
     
 
     return 0;
