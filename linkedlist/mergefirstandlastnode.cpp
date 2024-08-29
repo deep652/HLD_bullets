@@ -48,10 +48,12 @@ class linkedlist
         return root;
     }
     Node* reverseList(Node* root); 
-    void mergeFirstAndLast(Node *root);
+    Node * mergeFirstAndLast(Node *root);
+    Node* mergeKnodeAtAtime(Node *root, int k);
+    Node * mergek(Node *root, int k);
 
 }; 
-void linkedlist :: mergeFirstAndLast(Node * root)
+Node * linkedlist :: mergeFirstAndLast(Node * root)
 {
     int length = 0;
     Node* it = root;
@@ -64,7 +66,7 @@ void linkedlist :: mergeFirstAndLast(Node * root)
     int mid = length/2;
     int i=1;
     it = root;
-    while(i<mid)
+    while(i<=mid)
     {
         it = it->next;
         i++;
@@ -72,7 +74,7 @@ void linkedlist :: mergeFirstAndLast(Node * root)
    // cout<<"is reached : "<<i<<endl;
     Node * secondHalf = it->next;
     cout<<"end of first half"<<it->getData()<<endl;
-    //it->next = nullptr;//breaking the first half end with null
+    it->next = nullptr;//breaking the first half end with null
 
     //reverse the second half
 
@@ -81,18 +83,28 @@ void linkedlist :: mergeFirstAndLast(Node * root)
 
     Node* firstHalf = root;
     Node *n1, *n2, *fn;
-    while(firstHalf != nullptr && sd != nullptr)
+    while(sd != nullptr)
     {
         n1 = firstHalf -> next;
         n2 = sd -> next;
         firstHalf->next = sd;
+        sd -> next = n1;
+        
         firstHalf = n1;
-        sd -> next = firstHalf;
         sd = n2;
     }
     //if(firstHalf == nullptr)
-    cout<<sd->getData()<<endl;
-    cout<<"final list"<<root->next->next->next->getData()<<endl;
+    //cout<<sd->getData()<<endl;
+    //cout<<"final list"<<root->next->getData()<<endl;
+    it = root;
+    while(it!=nullptr)
+    {
+        cout<<it->getData()<<"\t";
+        it = it -> next;
+    }
+    cout<<endl;
+
+    return root;
 }
 
 Node* linkedlist:: createCopy()
@@ -102,7 +114,7 @@ Node* linkedlist:: createCopy()
     Node* newNode = new Node(it);
     
     Node* newroot = newNode;
-    cout<<"root is"<<root<<"new root os"<<newroot<<endl;
+    //cout<<"root is"<<root<<"new root os"<<newroot<<endl;
     itresult = newroot;
     it = it->next;
     while(it != nullptr)
@@ -115,7 +127,7 @@ Node* linkedlist:: createCopy()
     }
     //cout<<newroot->next->next->getData()<<endl;
     //cout<<newroot<<endl;
-    cout<<"copy is successful"<<endl;
+   // cout<<"copy is successful"<<endl;
     return newroot;
     
 }
@@ -135,6 +147,9 @@ void linkedlist:: createList()
     it->setNext(newnode);
     it = it->next;
     newnode = new Node(5);
+    it->setNext(newnode);
+    it = it->next;
+    newnode = new Node(6);
     it->setNext(newnode);
     it = it->next;
 
@@ -175,6 +190,63 @@ Node* linkedlist:: reverseList(Node *root)
     }
     return prev;
 }
+Node * linkedlist:: mergeKnodeAtAtime(Node *root, int k)
+{
+    int i = 0;
+    Node *head = root;
+    Node *curr = root;
+    Node *prev = nullptr;
+    Node *it = root;
+    Node *nextListRoot = nullptr;
+    if(root == nullptr || k==1)
+    {
+        return root;
+    }
+    while(it!=nullptr && i<k)
+    {
+        it = it->next;
+        i++;
+    }
+    if(it)
+    {
+        nextListRoot = it->next;
+        it ->next = nullptr;
+    }
+    
+    Node * reversedhead = reverseList(head);
+    root -> next = mergeKnodeAtAtime(nextListRoot, k);
+
+    return reversedhead;
+
+    //1 2 3 4 5 6
+    //3 2 1 6 5 4
+
+}
+Node * linkedlist::mergek(Node *root, int k)
+{
+    //reverse the first k node
+    //
+    Node *curr, *prev, *next;
+    curr = root;
+    prev = nullptr;
+    int i = 0;
+    if(root == nullptr || k == 1)
+        return curr;
+
+    while(curr != nullptr && i<k)
+    {
+        next = curr -> next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+        i++;
+    }
+
+    root->next = mergek(curr, k); //this will not be prev, as we already have reached till 3rd node, we want to reconnect 1 -> next revesesed
+    // node in the list
+
+    return prev;
+}
 int main()
 {
     linkedlist ll;
@@ -182,11 +254,21 @@ int main()
     ll.printList();
     Node *newroot;
     newroot = ll.createCopy();
-    ll.printList(newroot);
+    Node *root_copy = ll.createCopy();
+    //ll.printList(newroot);
     //Node *reverseroot = ll.reverseList();
     //ll.printList(reverseroot);
-    ll.mergeFirstAndLast(newroot);
-    ll.printList();
+    //ll.mergeFirstAndLast(newroot);
+    //Node *mergedroot = ll.mergeKnodeAtAtime(newroot, 3);
+    //ll.printList(mergedroot);
+    ll.printList(root_copy);
+    cout<<"merged k new list"<<endl;
+
+    //Node *mergeknew = ll.mergek(root_copy, 3);
+    //ll.printList(mergeknew);
+    Node *mergedroot = ll.mergeKnodeAtAtime(newroot, 3);
+    ll.printList(mergedroot);
+    
 
     return 0;
 }
